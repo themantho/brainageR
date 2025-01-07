@@ -72,17 +72,20 @@ pip install -U dcm2niix dcm2bids
 For dcm2bids usage, see https://unfmontreal.github.io/Dcm2Bids/3.2.0/
 dcm2bids will convert DICOMs to BIDS, a neuroimaging file format standard. The batch scripts in this repo expect BIDS format.
 
-## Step 3. Update the config file for your project
+## Step 3. Update the config file
 
-1. Replace USERNAME with your user or group name.
-2. Replace 'study' with the name of your dataset.
-3. Replace 'site' with the site name (e.g., for multi-site data) OR comment out.
+Several lines in the config file are user-specific (indicated by # CHANGE THIS VARIABLE in the config file):
 
-Housekeeping Notes:
+1. Line 15: Replace 'username' with your user or group name.
+2. Line 30: Replace 'study' with the name of your dataset.
+3. Line 31 (optional): If you only have one time point, then keep the default ses=01. If you have multiple time points, run the scripts with ses=01 first. For each additional time point, replace 'ses' with the BIDS session (i.e., timepoint) 0x, where x is the time point number (e.g., for baseline/T1: ses=01; T2: ses=02; T3: ses=03).
+4. Line 39: Replace 'your_BIDS_folder' in BIDS_DIR with the name of the folder containing the BIDS dataset.
 
-- The project paths will auto-populate with the user-defined variables.
-- Software paths are specified in .bashrc_fs.
+Housekeeping notes:
+
+- Software modules and paths are specified in .bashrc.
 - User-defined paths are specified in the config file.
+- The project paths will auto-populate with the user-defined variables.
 
 ## Step 4. Create a text file of subject IDs
 
@@ -125,11 +128,19 @@ Example: for subject IDs 001*S_100x_Tx, remove '001_S*' and '\_Tx'
 echo "$(sed -r 's/001_S_//;s/_T[0-9]//' subjects)" > $SCRIPTS_DIR/subjects
 ```
 
-## Step 4. Run batch script
+## Step 4. Edit and run the scripts
+
+Edit the following lines in slurm_submit_brainageR.sh
+
+```
+# Set up environment and change the username to your own
+SOURCE_FILE=/scratch/USERNAME/brainageR/software/bashrc
+CONFIG_FILE=/scratch/USERNAME/brainageR/software/config
+```
 
 The brain age is calculated in approx. 15-20 min for a subject when using --mem=24g (line 45). The script requests --time=20:00 (line 44) and --mem=24g (line 45). Increase --time (hr:min), if jobs are exceeding the time limit.
 
-The input for slurm_submit_brainageR.sh is the subjects ID text file. Submit the batch script to slurm with the command:
+The main batch script is slurm_submit_brainageR.sh and takes the subjects ID file as its input with the following command in terminal:
 
 ```
 sbatch slurm_submit_brainageR.sh subjects
