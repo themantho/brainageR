@@ -87,50 +87,58 @@ Housekeeping notes:
 - User-defined paths are specified in the config file.
 - The project paths will auto-populate with the user-defined variables.
 
-## Step 4. Create a text file of subject IDs
+## Step 4. Create a subject ID file
 
-Next, create a text file with subject IDs, one ID per line. Change /path/to/bids/directory and /path/to/scripts/directory to your own paths and run the following commands to create a text file with subject IDs. The file will be stored in SCRIPTS_DIR.
+Now we need to create a subject ID file. There is an example file in the subjectsIDs subfolder called 'subjects', with one ID per line. Either rename this file or delete it before creating your own subject file.
+Open a terminal window and change the current directory to the scripts folder, then load the config file and create a subject ID file with the following commands:
 
 ```
-BIDS_DIR=/path/to/bids/directory
-SCRIPTS_DIR=/path/to/scripts/directory
-$(echo ls $BIDS_DIR) > $SCRIPTS_DIR/subjects
+# Change current directory to the scripts folder, replacing 'username' with your own username.
+cd /scratch/username/brainageR/software
+
+# Load the config file - make sure you have completed Step 3 first!
+source ./config
+
+# Create the subject ID file
+$(echo ls $BIDS_DIR) > $SCRIPTS_DIR/subjectIDs/subjects
 ```
+
+The subject ID file will be stored in SCRIPTS_DIR/subjectIDs.
 
 ### Helpful commands if subject IDs include extraneous characters/numbers
 
 To remove a string pattern in the subject IDs
 
 ```
-echo "$(sed -r 's/PATTERN//' subjects)" > $SCRIPTS_DIR/subjects
+echo "$(sed -r 's/PATTERN//' subjects)" > $SCRIPTS_DIR/subjectIDs/subjects
 ```
 
 Example: For subject IDs 001*S_100x, remove '001_S*' and return only '100x'
 
 ```
-echo "$(sed -r 's/001*S*//' subjects)" > $SCRIPTS_DIR/subjects
+echo "$(sed -r 's/001*S*//' subjects)" > $SCRIPTS_DIR/subjectIDs/subjects
 ```
 
 To remove string patterns in multiple locations in the IDs, run the command:
 
 ```
-# Define the patterns
+# Define the string patterns
 PATTERN_ONE="replace with a string pattern"
 PATTERN_TWO="replace with another string pattern"
 
-echo "$(sed -r 's/PATTERN_ONE//;s/PATTERN_TWO//' subjects)" > $SCRIPTS_DIR/subjects
+echo "$(sed -r 's/PATTERN_ONE//;s/PATTERN_TWO//' subjects)" > $SCRIPTS_DIR/subjectIDs/subjects
 ```
 
-Example: for subject IDs 001*S_100x_Tx, remove '001_S*' and '\_Tx'
+Example: For subject IDs 001*S_100x_Tx, remove '001_S*' and '\_Tx'
 
 ```
 # T[0-9] means remove all numbers after 'T'
-echo "$(sed -r 's/001_S_//;s/_T[0-9]//' subjects)" > $SCRIPTS_DIR/subjects
+echo "$(sed -r 's/001_S_//;s/_T[0-9]//' subjects)" > $SCRIPTS_DIR/subjectIDs/subjects
 ```
 
 ## Step 4. Edit and run the scripts
 
-Edit the following lines in slurm_submit_brainageR.sh
+Change the username in (lines 10-11) in slurm_submit_brainageR.sh.
 
 ```
 # Set up environment and change the username to your own
@@ -138,29 +146,41 @@ SOURCE_FILE=/scratch/USERNAME/brainageR/software/bashrc
 CONFIG_FILE=/scratch/USERNAME/brainageR/software/config
 ```
 
-The brain age is calculated in approx. 15-20 min for a subject when using --mem=24g (line 45). The script requests --time=20:00 (line 44) and --mem=24g (line 45). Increase --time (hr:min), if jobs are exceeding the time limit.
-
 The main batch script is slurm_submit_brainageR.sh and takes the subjects ID file as its input with the following command in terminal:
 
 ```
 sbatch slurm_submit_brainageR.sh subjects
 ```
 
-Important: The "subjects" input intentionally omits the ".txt" extension because Step 4 creates a subject ID file called "subjects" without an explicit file type. This defaults to a text file, but you do not need to specify ".txt" in the sbatch input. In other words, "subjects" and "subjects.txt" are not equivalent file names. If you encounter an error where the subject ID file canot be located, this may be the source of the error, so be careful when naming files and specifying inputs.
+The batch script loops over an array of subject IDs and submits a separate job to slurm for each subject, allowing you to run multiple subjects in parallel.
 
-## Step 5. Collate subject files into single csv
+The script requests the following resources to calculate brain age in approx. 15 min for each subject:
+--time=20:00
+--mem=24g
+--cpus-per-task=4
+
+If jobs are exceeding the time limit (you can check for jobs cancelled due to time limit exceeded in the log folder), increase --time (format hr:min:sec) appropriately.
+
+IMPORTANT: The "subjects" input intentionally omits the ".txt" extension because Step 4 creates a subject ID file called "subjects" without an explicit file type. This defaults to a text file, but you do not need to specify ".txt" in the sbatch input. In other words, "subjects" and "subjects.txt" are not equivalent file names. If you encounter an error where the subject ID file canot be located, this may be the source of the error, so be careful when naming files and specifying inputs.
+
+## Step 5. Collate subject files into a single csv
 
 brainageR generates a .csv file for each subject. After the batch job has completed, you can collate all subject brain ages into a single .csv.
 
-The batch script performs this step after looping over all subjects. You can also comment out that line, process all subjects, then run the following command separately in terminal - this does not require activating the conda env or submitting a job to slurm.
+The batch script can perform this step after looping over all subjects. You can also comment out that line (current set up), process all subjects, then run the below command separately in terminal. This does not require activating the conda env or submitting a job to slurm, as the computational resources are minimal.
 
 ```
-# Define folder paths for SCRIPTS_DIR and OUT_DIR
-SCRIPTS_DIR=/SCRIPTS_DIR
-OUT_DIR=/OUT_DIR
+# Change current directory to the scripts folder, replacing 'username' with your own username.
+cd /scratch/username/brainageR/software
 
-# Replace FILENAME with the desired filename (e.g., STUDY_ses-01_brain_age.csv).
-source $SCRIPTS_DIR/collate_brain_ages.sh $OUT_DIR $OUT_DIR/"$FILENAME"_brain_age.csv
+# Load the config file
+source ./config
+
+# Either define the filename based on info in the config file or specify a filename
+filename="$study"_ses-"$ses"_brain_age.csv
+
+# Collate brain age into a csv file
+source $SCRIPTS_DIR/collate_brain_ages.sh $OUT_DIR $OUT_DIR/$filename
 ```
 
 The output file will include subject ID, brain age, and lower/upper confidence intervals. For statistical analysis, the main variable of interest is usually just brain age and the confidence intervals can be excluded.
