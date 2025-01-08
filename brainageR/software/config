@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Configuration file
+
+#----------------------------------------------------------------------------
+# Set folder paths - DO NOT CHANGE THESE VARIABLE NAMES. The folder names are case-sensitive and brainageR expects these specific variables.
+
+# username			user or group name
+# brainageR_dir		path to top-level brainage folder - do not change folder name
+# SCRIPTS_DIR		path to scripts
+# FSLDIR			path to FSL version
+# matlab_path		path to MATLAB version
+# spm_dir			path to SPM12
+#----------------------------------------------------------------------------
+username=tbaran2_lab # CHANGE THIS VARIABLE
+
+# These paths auto-populate or have already been tested on the Bluehive cluster. They do not need to be changed, unless you prefer a different FSL or MATLAB version.
+brainageR_dir=/scratch/$username/brainageR
+SCRIPTS_DIR=$brainageR_dir/software
+FSLDIR=/software/fsl/6.0.5.1
+matlab_path=/software/matlab/r2022a
+spm_dir=/software/spm/12
+
+#----------------------------------------------------------------------------
+# Set project parameters
+
+# study				change STUDY_NAME to study/project_name
+# ses				BIDS session (i.e., timepoint) 0x, where x is some number (e.g., for baseline/T1: ses=01; T2: ses=02). If you only have one timepoint, then keep as-is.
+#----------------------------------------------------------------------------
+study=ACT # CHANGE THIS VARIABLE
+ses=01
+#----------------------------------------------------------------------------
+# Auto-populated I/O folders
+
+# BIDS_DIR			path to the BIDS folder.
+# T1_DIR			path to folder to which raw T1w and intermediate files will be stored
+# OUT_DIR			path to brain age output
+#----------------------------------------------------------------------------
+BIDS_DIR=/scratch/$username/your_BIDS_folder # CHANGE THIS VARIABLE
+T1_DIR=$SCRIPTS_DIR/brainageR_t1
+OUT_DIR=$SCRIPTS_DIR/brainageR_output/$study
