@@ -1,12 +1,12 @@
-# brainageR v2.0
+# brainageR on a High-Performance Cluster
 
-This README is an abbreviated and modified version of the full README.md for setting up brainageR on a high-performance cluster (HPC). Refer to README.md for development details (i.e., model training, citations).
+This README is an abbreviated and modified version of the full README.md for setting up brainageR (https://github.com/james-cole/brainageR.git) on a high-performance cluster (HPC). Refer to README.md for development details (i.e., model training, citations).
 
-These instructions assume you have the brainageR folder with the modified setup. The modifications run the software more efficiently and do not alter the brain age calculation (i.e., only the instructions here will differ slightly from README.md). The setup has been tested and run on the HPC Bluehive at University of Rochester.
+These instructions assume you have downloaded the brainageR folder from this repo with the modified setup. The modifications allow batch running of the the brain age calculate more efficiently but do not alter the brain age calculation. The setup has been tested and run on the HPC Bluehive at University of Rochester.
 
 Note 1: The installation steps in the original README (under Installation) have already been performed. You do not need to download additional files from the original brainageR git repo.
 
-Note 2: The scripts expect BIDS format. See Step 2 and https://unfmontreal.github.io/Dcm2Bids/3.2.0/ for more details.
+Note 2: The scripts expect BIDS format. See Step 2 and https://unfmontreal.github.io/Dcm2Bids/3.2.0/ for more details on converting DICOMs.
 
 ## Folder structure
 
@@ -34,7 +34,7 @@ sub-002
 .
 sub-00n
 
-    When using a single subject ID file, make sure to overwrite it, rather than append new IDs to the existing list. Verify no whitespace or extra lines after the last ID exist.
+When using a single subject ID file, make sure to overwrite it, rather than append new IDs to the existing list. Verify no whitespace or extra lines after the last ID exist.
 
 /templates
 Templates used to calculate brain age. These are not script templates. DO NOT TOUCH. DO NOT CHANGE.
