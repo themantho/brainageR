@@ -1,8 +1,11 @@
-# brainageR on a High-Performance Cluster
+# brainageR: Running on a High-Performance Cluster
 
-This README is an abbreviated and modified version of the full README.md for setting up brainageR (https://github.com/james-cole/brainageR.git) on a high-performance cluster (HPC). Refer to README.md for development details (i.e., model training, citations).
+This README is a modified version of the original README.md for running brainageR (https://github.com/james-cole/brainageR.git) on a high-performance cluster (HPC). Refer to the original README.md for development details (i.e., model training, citations).
 
-These instructions assume you have downloaded the brainageR folder from this repo with the modified setup. The modifications allow batch running of the the brain age calculate more efficiently but do not alter the brain age calculation. The setup has been tested and run on the HPC Bluehive at University of Rochester.
+These instructions assume you have downloaded the brainageR folder from this repo with the modified setup. The modifications include the following:
+
+- Scripts for batch calculation of brain age. The scripts submit jobs more efficiently but do not alter the brain age calculation. The setup has been tested and run on the HPC Bluehive at University of Rochester.
+- pca_center.rds, pca_rotation.rds, and pca_scale.rds files are included in this repo and do not need to be added (as per the installation instructions in the original README). If you have trouble downloading the PCA files from this repo, you can download them from the brainageR v2.1 Releases [page](https://github.com/james-cole/brainageR/releases), [Zenodo](https://doi.org/10.5281/zenodo.3463212) or [OSF](https://osf.io/azwmg/). Download all three files and add them to the brainager/software subdirectory.
 
 Note 1: The installation steps in the original README (under Installation) have already been performed. You do not need to download additional files from the original brainageR git repo.
 
