@@ -11,11 +11,11 @@ source $CONFIG_FILE
 mapfile -t subjects <"$subjects"
 
 for subject in "${subjects[@]}"; do
-  # Generate the subject's folder in the destination
-  mkdir -p "${DEST}"/"${subject}"
+  # Generate the subject's folder in the brainageR T1 directory
+  mkdir -p "${T1_DIR}"/"${subject}"
 
   # Create the symbolic link between the BIDS T1w and the brainageR T1 directory
-  ln -s "$BIDS_DIR"/"$subject"/ses-"$ses"/anat/*T1w.nii.gz "${T1_DIR}"/"${subject}"
+  ln -s "${BIDS_DIR}"/"${subject}"/ses-"${ses}"/anat/*T1w.nii.gz "${T1_DIR}"/"${subject}"
 
   # Unzip the T1w file
   unzip "${T1_DIR}"/"${subject}"/"$subject"_ses-"$ses"_T1w.nii.gz
