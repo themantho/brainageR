@@ -70,6 +70,8 @@ Log and error files for dcm2bids and pydeface will be stored here. dcm2bids and 
 
 ## Script overview
 
+### Software folder
+
 The brainageR package uses a combination of scripts to perform the following steps:
 
 1. **Activate environment**: The `bashrc` file loads the HPC modules and software paths and activates the conda envrionment. The 'config' file includes user-defined paths and variables. The project paths will auto-populate with the user-defined variables.
@@ -79,6 +81,15 @@ The brainageR package uses a combination of scripts to perform the following ste
 3. **Brain age calculation**: The 'slurm_submit_brainageR.sh' script submits a job array by calling 'run_brainageR.sh' to calculate brain age for each subject.
 
 4. **Collate brain age calculations**: The 'collate_brain_ages.sh' script collates the individual brain age calculations into a single csv file. The output csv and individual subject brain age csv files are stored in brainageR/software/brainageR_output/<study_name>.
+
+### dcm2bids folder
+
+1. **Activate environment**: 'submit_dcm2bids.sh' calls the bashrc and config files in the software directory.
+2. loads the HPC modules and software paths and activates the conda envrionment. The 'config' file includes user-defined paths and variables. The project paths will auto-populate with the user-defined variables.
+
+3. **DICOM-BIDS conversion**: The `submit_dcm2bids.sh` script submits a job array by calling 'run_dcm2bids.sh' to convert the raw T1 images to BIDS for each subject. You can skip this step, if your data is already in BIDS format.
+
+4. **Brain age calculation**: The 'slurm_submit_brainageR.sh' script submits a job array by calling 'run_brainageR.sh' to calculate brain age for each subject.
 
 ## Step 1: Setup environment
 
@@ -111,15 +122,7 @@ conda -n create brainager python=3.10
 pip install -U dcm2niix dcm2bids pydeface
 ```
 
-## Step 2. Convert DICOMs to BIDS
-
-The batch scripts in this repo expect BIDS format.
-For dcm2bids usage, see https://unfmontreal.github.io/Dcm2Bids/3.2.0/
-dcm2bids will convert DICOMs to BIDS, a neuroimaging file format standard. It is recommended that you deface the anatomical T1w image using pydeface (https://github.com/poldracklab/pydeface).
-
-Several scripts are included in the dcm2bids directory to help you convert to BIDS. These files should NOT be used as-is and will require some editing based on your dataset, particularly the BIDS config file, which should be created based on your MRI acquisition protocol.
-
-## Step 3. Update the config file
+## Step 2. Update the config file
 
 Several lines in the config file are user-specific (indicated by # CHANGE THIS VARIABLE in the config file):
 
@@ -127,6 +130,51 @@ Several lines in the config file are user-specific (indicated by # CHANGE THIS V
 2. Line 30: Replace 'study' with the name of your dataset.
 3. Line 31 (optional): If you only have one time point, then keep the default ses=01. If you have multiple time points, run the scripts with ses=01 first. For each additional time point, replace 'ses' with the BIDS session (i.e., timepoint) 0x, where x is the time point number (e.g., for baseline/T1: ses=01; T2: ses=02; T3: ses=03).
 4. Line 39: Replace 'your_BIDS_folder' in BIDS_DIR with the name of the folder containing the BIDS dataset.
+
+## Step 3. Convert DICOMs to BIDS
+
+The batch scripts in this repo expect BIDS format.
+For dcm2bids usage, see https://unfmontreal.github.io/Dcm2Bids/3.2.0/
+dcm2bids will convert DICOMs to BIDS, a neuroimaging file format standard. It is recommended that you deface the anatomical T1w image using pydeface (https://github.com/poldracklab/pydeface).
+
+Several scripts are included in the dcm2bids directory to help you convert to BIDS. These files should NOT be used as-is and will require some editing based on your dataset:
+
+1. Configure the BIDS config file based on the MRI acquisition protocol for your dataset. At a minimum, the config figure should convert the anat T1w image to BIDS.
+2. Specify your username in 'submit_dcm2bids.sh'.
+
+
+### Helpful commands if subject IDs include extraneous characters/numbers
+
+Make sure to save the subjects ID file for dcm2bids in the dcm2bids directory.
+
+To remove a string pattern in the subject IDs:
+
+```bash
+echo "$(sed -r 's/PATTERN//' subjects)" > $SCRIPTS_DIR/subjects
+```
+
+Example: For subject IDs 001*S_100x, remove '001_S*' and return only '100x'
+
+```bash
+echo "$(sed -r 's/001*S*//' subjects)" > $SCRIPTS_DIR/subjects
+```
+
+To remove string patterns in multiple locations in the IDs:
+
+```bash
+# Define the string patterns
+PATTERN_ONE="replace with a string pattern"
+PATTERN_TWO="replace with another string pattern"
+
+echo "$(sed -r 's/PATTERN_ONE//;s/PATTERN_TWO//' subjects)" > $SCRIPTS_DIR/subjects
+```
+
+Example: For subject IDs 001*S_100x_Tx, remove '001_S*' and '\_Tx'
+
+```bash
+# T[0-9] means remove all numbers after 'T'
+echo "$(sed -r 's/001_S_//;s/_T[0-9]//' subjects)" > $SCRIPTS_DIR/subjects
+```
 
 ## Step 4. Create a subject ID file
 
@@ -147,38 +195,7 @@ $(echo ls $BIDS_DIR) > $SCRIPTS_DIR/subjectIDs/subjects
 
 The subject ID file will be stored in SCRIPTS_DIR/subjectIDs.
 
-### Converting DICOMs to BIDS: Helpful commands if subject IDs include extraneous characters/numbers
-
-To remove a string pattern in the subject IDs
-
-```bash
-echo "$(sed -r 's/PATTERN//' subjects)" > $SCRIPTS_DIR/subjectIDs/subjects
-```
-
-Example: For subject IDs 001*S_100x, remove '001_S*' and return only '100x'
-
-```bash
-echo "$(sed -r 's/001*S*//' subjects)" > $SCRIPTS_DIR/subjectIDs/subjects
-```
-
-To remove string patterns in multiple locations in the IDs, run the command:
-
-```bash
-# Define the string patterns
-PATTERN_ONE="replace with a string pattern"
-PATTERN_TWO="replace with another string pattern"
-
-echo "$(sed -r 's/PATTERN_ONE//;s/PATTERN_TWO//' subjects)" > $SCRIPTS_DIR/subjectIDs/subjects
-```
-
-Example: For subject IDs 001*S_100x_Tx, remove '001_S*' and '\_Tx'
-
-```bash
-# T[0-9] means remove all numbers after 'T'
-echo "$(sed -r 's/001_S_//;s/_T[0-9]//' subjects)" > $SCRIPTS_DIR/subjectIDs/subjects
-```
-
-## Step 4. Running the scripts
+## Step 4. Running the brainageR scripts
 
 The main batch script is slurm_submit_brainageR.sh and takes the subjects ID file as its input with the following command in terminal:
 
