@@ -1,32 +1,42 @@
 # brainageR: Running on a High-Performance Cluster
 
-This README is a modified version of the original README.md for running brainageR (https://github.com/james-cole/brainageR.git) on a high-performance cluster (HPC). Refer to the original README.md for development details (i.e., model training, citations).
+This repo gives an overview for running brainageR (https://github.com/james-cole/brainageR.git) on a high-performance cluster (HPC). Refer to the original README.md in the software folder for development details (i.e., model training, citations).
 
-These instructions assume you have downloaded the brainageR folder from this repo with the modified setup. The modifications include the following:
+The repo includes the following modifications:
 
-- Scripts for batch calculation of brain age. The scripts submit jobs more efficiently but do not alter the brain age calculation. The setup has been tested and run on the HPC Bluehive at University of Rochester.
-- pca_center.rds, pca_rotation.rds, and pca_scale.rds files are included in this repo and do not need to be added (as per the installation instructions in the original README). If you have trouble downloading the PCA files from this repo, you can download them from the brainageR v2.1 Releases [page](https://github.com/james-cole/brainageR/releases), [Zenodo](https://doi.org/10.5281/zenodo.3463212) or [OSF](https://osf.io/azwmg/). Download all three files and add them to the brainager/software subdirectory.
+1. Scripts for batch calculation of brain age. The scripts submit jobs more efficiently (submitting a single job array instead of generating a separate script to be run for each subject) but do not alter the brain age calculation. The setup has been tested and run on the HPC Bluehive at University of Rochester.
 
-Note 1: The installation steps in the original README (under Installation) have already been performed. You do not need to download additional files from the original brainageR git repo.
+2. The PCA files (pca_center.rds, pca_rotation.rds, and pca_scale.rds) you are instructed to download in the original README are already included in this repo. If you have trouble downloading these files from this repo, you can re-download them from the brainageR v2.1 Releases [page](https://github.com/james-cole/brainageR/releases), [Zenodo](https://doi.org/10.5281/zenodo.3463212) or [OSF](https://osf.io/azwmg/). Download all three files and add them to the software directory (do not create a new folder for them):
 
-Note 2: The scripts expect BIDS format. See Step 2 and https://unfmontreal.github.io/Dcm2Bids/3.2.0/ for more details on converting DICOMs.
+```
+brainageR/
+└── software/
+    ├── pca_center.rds
+    ├── pca_rotation.rds
+    └── pca_scale.rds
+    ...
+```
+
+3. Important: The scripts expect BIDS format. See Step 2 and https://unfmontreal.github.io/Dcm2Bids/3.2.0/ for more details on converting DICOMs to BIDS format.
 
 ## Folder structure
 
-The parent folder is called brainageR and contains a subfolder called software. Within /software are all subfolders and scripts (excluding your own data) needed to run the brain age calculation. Inside /software are the following subfolders:
+All scripts and brainageR model files are stored in the software directory:
 
 /brainageR_output
 Individual subject brain age and aggregate brain age files will be here after running the calculation.
 
+```
 /brainageR_T1
-Create symbolic links to subjects' raw (unprocessed) T1.nii (make sure they are unzipped) or copy the files here, with a separate folder for each subject (i.e., /brainageR_T1/sub-ID/sub-ID_ses-xx_T1w.nii).
-Important: The files should be .nii (unzipped nifti), not .nii.gz or another zip flavor. The folder will also contain intermediate files.
+Create symbolic links to subjects' raw (unprocessed) T1.nii (make sure they are unzipped) or copy the files here, with a separate folder for each subject (e.g., /brainageR_T1/sub-ID/sub-ID_ses-01_T1w.nii).
+
+Important: The files should be .nii (unzipped nifti), not .nii.gz or another zip flavor. Intermediate files will also be stored here.
 
 /logs
-When things go wrong, look here for log and error files.
+When things go wrong, look here for log and error files. If this folder does not exist initially, it will be created when you run the script.
 
 /scripts_templates
-Script templates specified in README.md are here. To use a template, create a copy of the script and move into /software, then edit. If you want to create more work for yourself and run a separate script for each subject, then these scripts are for you.
+Original script templates referenced in the original README.md are here. To use a template, create a copy of the script and move into /software, then edit.
 
 /subjectIDs
 If you read nothing else but this, this should be a text file with one ID per line and no extra whitespace before/after each ID, e.g.,
@@ -41,6 +51,7 @@ When using a single subject ID file, make sure to overwrite it, rather than appe
 
 /templates
 Templates used to calculate brain age. These are not script templates. DO NOT TOUCH. DO NOT CHANGE.
+```
 
 ## Step 1: Setup environment
 
