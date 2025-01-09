@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Configuration file for dcm2bids
+
+# CHANGE THESE VARIABLES
+user=manthon6
+DATASET_NAME=ACT
+
+ses=01 # BIDS session: 01=T1_baseline, 03=T2_6mo, 04=T4_12mo, 05=T5_18mo. No imaging collected at 02=T2_3mo
+timepoint_id=T1
+timepoint="$timepoint_id"_baseline
+
+HOME_DIR=/scratch/$user
+SCRIPTS_DIR=/scratch/$user/brainageR/dcm2bids
+LOG_DIR=$SCRIPTS_DIR/logs
+
+DATA_DIR=$HOME_DIR/$DATASET_NAME/data
+BIDS_DIR=$DATA_DIR/bids
+DICOM_DIR=$DATA_DIR/dicoms/$timepoint # Remove the timepoint variable, if it it not needed for your dataset
+
+# Path to dcm2bids config file - configure this beforehand before running dcm2bids. DO NOT run as-is for your dataset.
+CONFIG_BIDS=$SCRIPTS_DIR/bids_config/config.json
