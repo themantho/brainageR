@@ -6,7 +6,8 @@
 
 subjects=${1} # name of subject ID txt file
 
-# Set up environment and change the username to your own
+# Set up environment
+# CHANGE USERNAME TO YOUR OWN
 SOURCE_FILE=/scratch/USERNAME/brainageR/software/bashrc
 CONFIG_FILE=/scratch/USERNAME/brainageR/software/config
 
