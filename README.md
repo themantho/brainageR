@@ -50,7 +50,7 @@ Copies of the scripts referenced in the original README.md are here, as a backup
 
 Store subject ID files here. The subject ID file should be a text file with one ID per line and no extra whitespace before/after each ID. An example file is provided in this folder.
 
-When using a single subject ID file, make sure to overwrite it, rather than append new IDs to the existing list. Verify no whitespace or extra lines exist after the last ID so that slurm does not submit a job for an "empty ID". When working with multiple subject ID files (e.g., multi-site data, testing a subject), it is recommended that you add a suffix to the 'subjects' file name (e.g., subjects_test, subjects_sitename), so that you can switch between different ID files when needed instead of repeatedly generating differently ID files.
+When using a single subject ID file, make sure to overwrite it, rather than append new IDs to the existing list. Verify no whitespace or extra lines exist after the last ID so that slurm does not submit a job for an "empty ID". When working with multiple subject ID files (e.g., multi-site data, testing a subject), it is recommended that you add a suffix to the 'subjects' file name (e.g., subjects_test, subjects_sitename), so that you can switch between different ID files when needed instead of repeatedly generating different ID files.
 
 /templates
 
