@@ -4,7 +4,7 @@
 
 subjects=${1} # text file with subject IDs
 
-# CHANGE LOCATION TO THE SOURCE AND CONFIG FILE
+# CHANGE USERNAME TO YOUR OWN
 SOURCE_FILE=/scratch/USERNAME/brainageR/software/bashrc
 CONFIG_FILE=/scratch/USERNAME/brainageR/software/config
 
