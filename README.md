@@ -48,14 +48,9 @@ Copies of the scripts referenced in the original README.md are here, as a backup
 
 /subjectIDs
 
-Store subject ID files here. The subject ID file should be a text file with one ID per line and no extra whitespace before/after each ID, e.g.,
-sub-001
-sub-002
-.
-.
-sub-00n
+Store subject ID files here. The subject ID file should be a text file with one ID per line and no extra whitespace before/after each ID. An example file is provided in this folder.
 
-When using a single subject ID file, make sure to overwrite it, rather than append new IDs to the existing list. Verify no whitespace or extra lines exist after the last ID so that slurm does not submit a job for an "empty ID".
+When using a single subject ID file, make sure to overwrite it, rather than append new IDs to the existing list. Verify no whitespace or extra lines exist after the last ID so that slurm does not submit a job for an "empty ID". When working with multiple subject ID files (e.g., multi-site data, testing a subject), it is recommended that you add a suffix to the 'subjects' file name (e.g., subjects_test, subjects_sitename), so that you can switch between different ID files when needed instead of repeatedly generating differently ID files.
 
 /templates
 
@@ -63,7 +58,7 @@ Templates used to calculate brain age. These are not script templates. DO NOT TO
 
 ### dcm2bids folder
 
-Scripts for converting DICOMs to BIDS using the dcm2bids package are located in the dcm2bids folder.
+Example scripts for converting DICOMs to BIDS using the dcm2bids package are located in the dcm2bids folder. Note: These scripts were originally written for
 
 /bids_config
 
@@ -71,7 +66,7 @@ Contains the BIDS configuration file. The config file should be created based on
 
 /logs
 
-Log and error files for dcm2bids and pydeface will be stored here. Log subdirectories will be created by 'submit_dcm2bids.sh', if they do not exist.
+Log and error files for dcm2bids and pydeface will be stored here. dcm2bids and pydeface log subdirectories will be created by 'submit_dcm2bids.sh'.
 
 ## Script overview
 
