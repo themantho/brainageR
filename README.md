@@ -1,12 +1,12 @@
 # brainageR: Running on a High-Performance Cluster
 
-This repo gives an overview for running brainageR (https://github.com/james-cole/brainageR.git) on a high-performance cluster (HPC). Refer to the original README.md in the software folder for development details (i.e., model training, citations).
+This repo gives an overview for running brainageR (https://github.com/james-cole/brainageR.git) on a high-performance cluster (HPC). Refer to the original README.md in the software folder for development details (i.e., model training, citations). The setup has been tested and run on the HPC Bluehive at University of Rochester.
 
 The repo includes the following modifications:
 
-1. Scripts for batch calculation of brain age. The scripts submit jobs more efficiently (submitting a single job array instead of generating a separate script to be run for each subject) but do not alter the brain age calculation. The setup has been tested and run on the HPC Bluehive at University of Rochester.
+1. Scripts for batch calculation of brain age. The scripts submit jobs more efficiently by submitting a single job array instead of generating a separate script to be run for each subject. The brain age calculation itself remains unchanged.
 
-2. The PCA files (pca_center.rds, pca_rotation.rds, and pca_scale.rds) you are instructed to download in the original README are already included in this repo. If you have trouble downloading these files from this repo, you can re-download them from the brainageR v2.1 Releases [page](https://github.com/james-cole/brainageR/releases), [Zenodo](https://doi.org/10.5281/zenodo.3463212) or [OSF](https://osf.io/azwmg/). Download all three files and add them to the software directory (do not create a new folder for them):
+2. brainageR requires three PCA files (see the Installation section in the original README for details): pca_center.rds, pca_scale.rds, and pca_rotation.rds. Two of the three files (pca_center.rds and pca_scale.rds) are already included in the software directory and do not need to be downloaded. You will need to download pca_rotation.rds separately because it exceeds GitHub's file size limits. Download pca_rotation.rds from the brainageR v2.1 Releases [page](https://github.com/james-cole/brainageR/releases), [Zenodo](https://doi.org/10.5281/zenodo.3463212) or [OSF](https://osf.io/azwmg/) and add it to the software directory so that the directory looks like this:
 
 ```
 brainageR/
@@ -17,74 +17,90 @@ brainageR/
     ...
 ```
 
-3. Important: The scripts expect BIDS format. See Step 2 and https://unfmontreal.github.io/Dcm2Bids/3.2.0/ for more details on converting DICOMs to BIDS format.
+3. Important: The modified scripts expect BIDS format. See Step 2 and https://unfmontreal.github.io/Dcm2Bids/3.2.0/ for more details on converting DICOMs to BIDS format.
 
 ## Folder structure
 
 All scripts and brainageR model files are stored in the software directory:
 
 /brainageR_output
-Individual subject brain age and aggregate brain age files will be here after running the calculation.
 
-```
+    Individual subject brain age and aggregate brain age files will be here after running the calculation.
+
 /brainageR_T1
-Create symbolic links to subjects' raw (unprocessed) T1.nii (make sure they are unzipped) or copy the files here, with a separate folder for each subject (e.g., /brainageR_T1/sub-ID/sub-ID_ses-01_T1w.nii).
 
-Important: The files should be .nii (unzipped nifti), not .nii.gz or another zip flavor. Intermediate files will also be stored here.
+    Create symbolic links to subjects' raw (unprocessed) T1.nii (make sure they are unzipped) or copy the files here, with a separate folder for each subject (e.g., /brainageR_T1/sub-ID/sub-ID_ses-01_T1w.nii).
+
+    Important:
+    The files should be .nii (unzipped nifti), not .nii.gz or another zip flavor. Intermediate files will also be stored here.
 
 /logs
-When things go wrong, look here for log and error files. If this folder does not exist initially, it will be created when you run the script.
+
+    When things go wrong, look here for log and error files. If this folder does not exist initially, it will be created when you run the script.
 
 /scripts_templates
-Original script templates referenced in the original README.md are here. To use a template, create a copy of the script and move into /software, then edit.
+
+    Original script templates referenced in the original README.md are here. To use a template, create a copy of the script and move into /software, then edit.
 
 /subjectIDs
-If you read nothing else but this, this should be a text file with one ID per line and no extra whitespace before/after each ID, e.g.,
-sub-001
-sub-002
-.
-.
-.
-sub-00n
 
-When using a single subject ID file, make sure to overwrite it, rather than append new IDs to the existing list. Verify no whitespace or extra lines after the last ID exist.
+    Store subject ID files here. The subject ID file should be a text file with one ID per line and no extra whitespace before/after each ID, e.g.,
+    sub-001
+    sub-002
+    .
+    .
+    sub-00n
+
+    When using a single subject ID file, make sure to overwrite it, rather than append new IDs to the existing list. Verify no whitespace or extra lines exist after the last ID so that slurm does not submit a job for an "empty ID".
 
 /templates
-Templates used to calculate brain age. These are not script templates. DO NOT TOUCH. DO NOT CHANGE.
-```
+
+    Templates used to calculate brain age. These are not script templates. DO NOT TOUCH. DO NOT CHANGE.
+
+## Script overview
+
+The brainageR package uses a combination of scripts to perform the following steps:
+
+1. **Activate environment**: The `bashrc` file loads the HPC modules and software paths and activates the conda envrionment. The 'config' file includes user-defined paths and variables. The project paths will auto-populate with the user-defined variables.
+
+2. **Data preparation**: The `prep_data.sh` script converts the raw T1 images to BIDS
 
 ## Step 1: Setup environment
 
 Open terminal and load the R module, then install the RNifti, kernlab, and stringr libraries in your home directory. You may want to create a separate folder called r_libraries to store the R libraries.
 
-```
+```bash
 module load r
 
 # To create a folder for the R libraries, uncomment and run the following code, replacing "username" in the folder path with your username.
 # mkdir -p /home/username/r_libraries
 # example: mkdir -p /home/manthon6/r_libraries
+```
 
+```r
 # Install the R packages
 install.packages("RNifti")
 install.packages("kerrnlab")
 install.packages("stringr")
 ```
 
-Create a conda env named 'brainager'. The bashrc_fs file does not create a conda env. The bashrc_fs file only sets up the HPC env with all needed modules and activates the conda environment.
+The bashrc file does not create a conda env. The bashrc file only sets up the HPC env with the needed modules and activates the conda environment.
 
-Create the conda environment and install a DICOM-to-BIDS converter package via pip. You may need to upgrade pip first.
+Create a conda environment named 'brainager' and install dcm2niix, dcm2bids, and pydeface via pip. You may need to upgrade pip first.
 
-```
-conda -n create brainager
+```python
+# Create a conda environment
+conda -n create brainager python=3.10
 
 # Install latest version of dcm2niix and DICOM-to-BIDS converter
-pip install -U dcm2niix dcm2bids
+pip install -U dcm2niix dcm2bids pydeface
 ```
 
 ## Step 2. Convert DICOMs to BIDS
 
+The batch scripts in this repo expect BIDS format.
 For dcm2bids usage, see https://unfmontreal.github.io/Dcm2Bids/3.2.0/
-dcm2bids will convert DICOMs to BIDS, a neuroimaging file format standard. The batch scripts in this repo expect BIDS format.
+dcm2bids will convert DICOMs to BIDS, a neuroimaging file format standard. It is recommended that you deface the anatomical T1w image using pydeface (https://github.com/poldracklab/pydeface).
 
 ## Step 3. Update the config file
 
@@ -95,18 +111,13 @@ Several lines in the config file are user-specific (indicated by # CHANGE THIS V
 3. Line 31 (optional): If you only have one time point, then keep the default ses=01. If you have multiple time points, run the scripts with ses=01 first. For each additional time point, replace 'ses' with the BIDS session (i.e., timepoint) 0x, where x is the time point number (e.g., for baseline/T1: ses=01; T2: ses=02; T3: ses=03).
 4. Line 39: Replace 'your_BIDS_folder' in BIDS_DIR with the name of the folder containing the BIDS dataset.
 
-Housekeeping notes:
-
-- Software modules and paths are specified in .bashrc.
-- User-defined paths are specified in the config file.
-- The project paths will auto-populate with the user-defined variables.
-
 ## Step 4. Create a subject ID file
 
-Now we need to create a subject ID file. There is an example file in the subjectsIDs subfolder called 'subjects', with one ID per line. Either rename this file or delete it before creating your own subject file.
+Now we need to create a subject ID file. There is an example file in the subjectsIDs subfolder called 'subjects'. Either rename this file or delete it before creating your own subject ID file.
+
 Open a terminal window and change the current directory to the scripts folder, then load the config file and create a subject ID file with the following commands:
 
-```
+```bash
 # Change current directory to the scripts folder, replacing 'username' with your own username.
 cd /scratch/username/brainageR/software
 
@@ -123,19 +134,19 @@ The subject ID file will be stored in SCRIPTS_DIR/subjectIDs.
 
 To remove a string pattern in the subject IDs
 
-```
+```bash
 echo "$(sed -r 's/PATTERN//' subjects)" > $SCRIPTS_DIR/subjectIDs/subjects
 ```
 
 Example: For subject IDs 001*S_100x, remove '001_S*' and return only '100x'
 
-```
+```bash
 echo "$(sed -r 's/001*S*//' subjects)" > $SCRIPTS_DIR/subjectIDs/subjects
 ```
 
 To remove string patterns in multiple locations in the IDs, run the command:
 
-```
+```bash
 # Define the string patterns
 PATTERN_ONE="replace with a string pattern"
 PATTERN_TWO="replace with another string pattern"
@@ -145,30 +156,22 @@ echo "$(sed -r 's/PATTERN_ONE//;s/PATTERN_TWO//' subjects)" > $SCRIPTS_DIR/subje
 
 Example: For subject IDs 001*S_100x_Tx, remove '001_S*' and '\_Tx'
 
-```
+```bash
 # T[0-9] means remove all numbers after 'T'
 echo "$(sed -r 's/001_S_//;s/_T[0-9]//' subjects)" > $SCRIPTS_DIR/subjectIDs/subjects
 ```
 
-## Step 4. Edit and run the scripts
-
-Change the username in (lines 10-11) in slurm_submit_brainageR.sh.
-
-```
-# Set up environment and change the username to your own
-SOURCE_FILE=/scratch/USERNAME/brainageR/software/bashrc
-CONFIG_FILE=/scratch/USERNAME/brainageR/software/config
-```
+## Step 4. Running the scripts
 
 The main batch script is slurm_submit_brainageR.sh and takes the subjects ID file as its input with the following command in terminal:
 
-```
+```bash
 sbatch slurm_submit_brainageR.sh subjects
 ```
 
-The batch script loops over an array of subject IDs and submits a separate job to slurm for each subject, allowing you to run multiple subjects in parallel.
+slurm_submit_brainageR.sh loops over the array of subject IDs and submits run_brainageR.sh as a separate job to slurm for each subject, allowing you to run multiple subjects in parallel.
 
-The script requests the following resources to calculate brain age in approx. 15 min for each subject:
+The script requests the following resources to calculate brain age in approximately 15 min for each subject:
 --time=20:00
 --mem=24g
 --cpus-per-task=4
@@ -176,6 +179,14 @@ The script requests the following resources to calculate brain age in approx. 15
 If jobs are exceeding the time limit (you can check for jobs cancelled due to time limit exceeded in the log folder), increase --time (format hr:min:sec) appropriately.
 
 IMPORTANT: The "subjects" input intentionally omits the ".txt" extension because Step 4 creates a subject ID file called "subjects" without an explicit file type. This defaults to a text file, but you do not need to specify ".txt" in the sbatch input. In other words, "subjects" and "subjects.txt" are not equivalent file names. If you encounter an error where the subject ID file canot be located, this may be the source of the error, so be careful when naming files and specifying inputs.
+
+Change the username in slurm_submit_brainageR.sh.
+
+```bash
+# Set up environment and change the username to your own
+SOURCE_FILE=/scratch/USERNAME/brainageR/software/bashrc
+CONFIG_FILE=/scratch/USERNAME/brainageR/software/config
+```
 
 ## Step 5. Collate subject files into a single csv
 
