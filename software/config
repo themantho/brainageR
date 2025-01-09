@@ -39,10 +39,10 @@ ses=01
 # OUT_DIR			Path to brain age output
 # CONFIG_BIDS       Path to dcm2bids config file
 #----------------------------------------------------------------------------
-BIDS_DIR=/path/to/bids # CHANGE THIS
-DICOM_DIR=/path/to/dicoms # CHANGE THIS
+BIDS_DIR=/path/to/bids # CHANGE THIS OR COMMENT OUT
+DICOM_DIR=/path/to/dicoms # CHANGE THIS OR COMMENT OUT
+CONFIG_BIDS=$SCRIPTS_DIR/bids_config/config.json
+
 LOG_DIR=$SCRIPTS_DIR/logs
 T1_DIR=$SCRIPTS_DIR/brainageR_t1
 OUT_DIR=$SCRIPTS_DIR/brainageR_output/$study
-
-CONFIG_BIDS=$SCRIPTS_DIR/bids_config/config.json
