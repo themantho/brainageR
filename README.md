@@ -44,7 +44,7 @@ When things go wrong, look here for log and error files. If this folder does not
 
 /scripts_templates
 
-Original script templates referenced in the original README.md are here. To use a template, create a copy of the script and move into /software, then edit.
+Copies of the scripts referenced in the original README.md are here, as a backup.
 
 /subjectIDs
 
