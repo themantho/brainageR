@@ -12,7 +12,7 @@
 # matlab_path		path to MATLAB version
 # spm_dir			path to SPM12
 #----------------------------------------------------------------------------
-username=tbaran2_lab # CHANGE THIS VARIABLE
+username=your_username # CHANGE THIS
 
 # These paths auto-populate or have already been tested on the Bluehive cluster. They do not need to be changed, unless you prefer a different FSL or MATLAB version.
 brainageR_dir=/scratch/$username/brainageR
@@ -27,16 +27,22 @@ spm_dir=/software/spm/12
 # study				change STUDY_NAME to study/project_name
 # ses				BIDS session (i.e., timepoint) 0x, where x is some number (e.g., for baseline/T1: ses=01; T2: ses=02). If you only have one timepoint, then keep as-is.
 #----------------------------------------------------------------------------
-study=study_name # CHANGE THIS VARIABLE
+study=study_name # CHANGE THIS
 ses=01
 #----------------------------------------------------------------------------
-# Auto-populated I/O folders
+# I/O folders
 
-# BIDS_DIR			path to the BIDS folder.
-# T1_DIR			path to folder to which raw T1w and intermediate files will be stored
-# OUT_DIR			path to brain age output
+# BIDS_DIR			Path to the BIDS directory
+# DICOM_DIR	        Path to the DICOM directory
+# LOG_DIR	        Path to the log directory
+# T1_DIR			Path to the directory containing raw T1w
+# OUT_DIR			Path to brain age output
+# CONFIG_BIDS       Path to dcm2bids config file
 #----------------------------------------------------------------------------
-BIDS_DIR=/scratch/$username/your_BIDS_folder # CHANGE THIS VARIABLE
+BIDS_DIR=/path/to/bids # CHANGE THIS
+DICOM_DIR=/path/to/dicoms # CHANGE THIS
+LOG_DIR=$SCRIPTS_DIR/logs
 T1_DIR=$SCRIPTS_DIR/brainageR_t1
 OUT_DIR=$SCRIPTS_DIR/brainageR_output/$study
-LOG_DIR=$SCRIPTS_DIR/logs
+
+CONFIG_BIDS=$SCRIPTS_DIR/bids_config/config.json
