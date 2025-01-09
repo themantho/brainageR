@@ -21,41 +21,57 @@ brainageR/
 
 ## Folder structure
 
-All scripts and brainageR model files are stored in the software directory:
+There are two subdirectories: software and dcm2bids.
+
+### Software folder
+
+All brainageR scripts and model data are stored in the software directory:
 
 /brainageR_output
 
-    Individual subject brain age and aggregate brain age files will be here after running the calculation.
+Individual subject brain age and aggregate brain age files will be here after running the calculation.
 
 /brainageR_T1
 
-    Create symbolic links to subjects' raw (unprocessed) T1.nii (make sure they are unzipped) or copy the files here, with a separate folder for each subject (e.g., /brainageR_T1/sub-ID/sub-ID_ses-01_T1w.nii).
+Create symbolic links to subjects' raw (unprocessed) T1.nii (make sure they are unzipped) or copy the files here, with a separate folder for each subject (e.g., /brainageR_T1/sub-ID/sub-ID_ses-01_T1w.nii).
 
-    Important:
-    The files should be .nii (unzipped nifti), not .nii.gz or another zip flavor. Intermediate files will also be stored here.
+Important:
+The files should be .nii (unzipped nifti), not .nii.gz or another zip flavor. Intermediate files will also be stored here.
 
 /logs
 
-    When things go wrong, look here for log and error files. If this folder does not exist initially, it will be created when you run the script.
+When things go wrong, look here for log and error files. If this folder does not exist initially, it will be created when you run the script.
 
 /scripts_templates
 
-    Original script templates referenced in the original README.md are here. To use a template, create a copy of the script and move into /software, then edit.
+Original script templates referenced in the original README.md are here. To use a template, create a copy of the script and move into /software, then edit.
 
 /subjectIDs
 
-    Store subject ID files here. The subject ID file should be a text file with one ID per line and no extra whitespace before/after each ID, e.g.,
-    sub-001
-    sub-002
-    .
-    .
-    sub-00n
+Store subject ID files here. The subject ID file should be a text file with one ID per line and no extra whitespace before/after each ID, e.g.,
+sub-001
+sub-002
+.
+.
+sub-00n
 
-    When using a single subject ID file, make sure to overwrite it, rather than append new IDs to the existing list. Verify no whitespace or extra lines exist after the last ID so that slurm does not submit a job for an "empty ID".
+When using a single subject ID file, make sure to overwrite it, rather than append new IDs to the existing list. Verify no whitespace or extra lines exist after the last ID so that slurm does not submit a job for an "empty ID".
 
 /templates
 
-    Templates used to calculate brain age. These are not script templates. DO NOT TOUCH. DO NOT CHANGE.
+Templates used to calculate brain age. These are not script templates. DO NOT TOUCH. DO NOT CHANGE.
+
+### dcm2bids folder
+
+Scripts for converting DICOMs to BIDS using the dcm2bids package are located in the dcm2bids folder.
+
+/bids_config
+
+Contains the BIDS configuration file. The config file should be created based on your MRI acquisition protocol parameters. By default it will deface the T1w image using pydeface. Note that this config is designed for dcm2bids >=3.0.0. dcm2bids>=3.0.0 is not compatible with config files made for v2.1.9 and below.
+
+/logs
+
+Log and error files for dcm2bids and pydeface will be stored here. Log subdirectories will be created by 'submit_dcm2bids.sh', if they do not exist.
 
 ## Script overview
 
@@ -63,7 +79,11 @@ The brainageR package uses a combination of scripts to perform the following ste
 
 1. **Activate environment**: The `bashrc` file loads the HPC modules and software paths and activates the conda envrionment. The 'config' file includes user-defined paths and variables. The project paths will auto-populate with the user-defined variables.
 
-2. **Data preparation**: The `prep_data.sh` script converts the raw T1 images to BIDS
+2. **DICOM-BIDS conversion**: The `submit_dcm2bids.sh` script submits a job array by calling 'run_dcm2bids.sh' to convert the raw T1 images to BIDS for each subject. You can skip this step, if your data is already in BIDS format.
+
+3. **Brain age calculation**: The 'slurm_submit_brainageR.sh' script submits a job array by calling 'run_brainageR.sh' to calculate brain age for each subject.
+
+4. **Collate brain age calculations**: The 'collate_brain_ages.sh' script collates the individual brain age calculations into a single csv file. The output csv and individual subject brain age csv files are stored in brainageR/software/brainageR_output/<study_name>.
 
 ## Step 1: Setup environment
 
@@ -102,6 +122,8 @@ The batch scripts in this repo expect BIDS format.
 For dcm2bids usage, see https://unfmontreal.github.io/Dcm2Bids/3.2.0/
 dcm2bids will convert DICOMs to BIDS, a neuroimaging file format standard. It is recommended that you deface the anatomical T1w image using pydeface (https://github.com/poldracklab/pydeface).
 
+Several scripts are included in the dcm2bids directory to help you convert to BIDS. These files should NOT be used as-is and will require some editing based on your dataset, particularly the BIDS config file, which should be created based on your MRI acquisition protocol.
+
 ## Step 3. Update the config file
 
 Several lines in the config file are user-specific (indicated by # CHANGE THIS VARIABLE in the config file):
@@ -130,7 +152,7 @@ $(echo ls $BIDS_DIR) > $SCRIPTS_DIR/subjectIDs/subjects
 
 The subject ID file will be stored in SCRIPTS_DIR/subjectIDs.
 
-### Helpful commands if subject IDs include extraneous characters/numbers
+### Converting DICOMs to BIDS: Helpful commands if subject IDs include extraneous characters/numbers
 
 To remove a string pattern in the subject IDs
 
