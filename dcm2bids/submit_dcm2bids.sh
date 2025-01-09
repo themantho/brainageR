@@ -28,12 +28,11 @@ mkdir -p "$LOG_DIR"/dcm2bids
 mkdir -p "$LOG_DIR"/pydeface
 mkdir -p "$BIDS_DIR"
 
-for idx in "${!subjects[@]}"; do
-	subject_folder=${subjects[$idx]}
+for subject in "${subjects[@]}"; do
 
 	# extract subject ID - EXAMPLE if your subject IDs have a prefix.
-	subject=${subject_folder#"$site_id"} # remove site ID prefix
-	subject=${subject%%-*}               # remove non-ID digits
+	#subject=${subject_folder#"$site_id"} # remove site ID prefix
+	#subject=${subject%%-*}               # remove non-ID digits
 
 	STEP1=$(sb "$OPTIONS" \
 		--time=1:00:00 \
@@ -41,7 +40,8 @@ for idx in "${!subjects[@]}"; do
 		--cpus-per-task=4 \
 		--job-name=dcm2bids \
 		--export=ALL,CONFIG_FILE \
-		--output="$LOG_DIR"/dcm2bids/dcm2bids_"$subject_folder"_%j.log \
-		--error="$LOG_DIR"/dcm2bids/dcm2bids_"$subject_folder"_%j.error \
-		"$SCRIPTS_DIR"/run_dcm2bids.sh "$subject" "$subject_folder")
+		--output="$LOG_DIR"/dcm2bids/dcm2bids_"$subject"_%j.log \
+		--error="$LOG_DIR"/dcm2bids/dcm2bids_"$subject"_%j.error \
+		"$SCRIPTS_DIR"/run_dcm2bids.sh "$subject")
+
 done
