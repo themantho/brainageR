@@ -41,10 +41,6 @@ mapfile -t subjects <"$subjects"
 # Calculate brain age for each subject
 for subject in "${subjects[@]}"; do
 
-	# Copy subject's raw T1 to the brainageR_T1 folder
-	#mkdir -p $T1_DIR/$subject
-	#cp -u $BIDS_DIR/anat/"$subject"_ses-"$ses"_T1w.nii.gz $T1_DIR/$subject $T1_DIR/$subject
-
 	STEP1=$(sb "$OPTIONS" \
 		--time=20:00 \
 		--mem=24g \
