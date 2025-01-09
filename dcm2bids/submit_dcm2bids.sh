@@ -6,7 +6,7 @@ subjects=${1} # text file with subject IDs
 
 # CHANGE LOCATION TO THE SOURCE AND CONFIG FILE
 SOURCE_FILE=/scratch/USERNAME/brainageR/software/bashrc
-CONFIG_FILE=/scratch/USERNAME/brainageR/dcm2bids/config_dcm2bids
+CONFIG_FILE=/scratch/USERNAME/brainageR/software/config
 
 source $SOURCE_FILE
 source $CONFIG_FILE
@@ -24,8 +24,8 @@ function sb() {
 mapfile -t subjects <"$subjects"
 
 # create log files
-mkdir -p "$LOG_DIR"/pydeface
 mkdir -p "$LOG_DIR"/dcm2bids
+mkdir -p "$LOG_DIR"/pydeface
 mkdir -p "$BIDS_DIR"
 
 for idx in "${!subjects[@]}"; do
