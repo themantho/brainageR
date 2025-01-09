@@ -27,7 +27,7 @@ spm_dir=/software/spm/12
 # study				change STUDY_NAME to study/project_name
 # ses				BIDS session (i.e., timepoint) 0x, where x is some number (e.g., for baseline/T1: ses=01; T2: ses=02). If you only have one timepoint, then keep as-is.
 #----------------------------------------------------------------------------
-study=ACT # CHANGE THIS VARIABLE
+study=study_name # CHANGE THIS VARIABLE
 ses=01
 #----------------------------------------------------------------------------
 # Auto-populated I/O folders
@@ -39,3 +39,4 @@ ses=01
 BIDS_DIR=/scratch/$username/your_BIDS_folder # CHANGE THIS VARIABLE
 T1_DIR=$SCRIPTS_DIR/brainageR_t1
 OUT_DIR=$SCRIPTS_DIR/brainageR_output/$study
+LOG_DIR=$SCRIPTS_DIR/logs
