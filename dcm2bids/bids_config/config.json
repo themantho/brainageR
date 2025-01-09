@@ -1,0 +1,88 @@
+{
+  "search_method": "fnmatch",
+  "case_sensitive": true,
+  "dup_method": "dup",
+  "descriptions": [
+    {
+      "datatype": "anat",
+      "suffix": "T1w",
+      "criteria": {
+        "ProtocolName": {"any" : ["*t1*", "*T1*"]},
+        "SeriesDescription": {"any" : ["*t1*", "T1"]}
+      }
+    },
+    {
+      "datatype": "anat",
+      "suffix": "flair",
+      "criteria": {
+        "ProtocolName": {"any" : ["*FLAIR", "*flair"]},
+        "SeriesDescription": {"any" : ["*FLAIR", "*flair"]}
+      }
+    },
+    {
+     "id": "id_dwi",
+      "datatype": "dwi",
+      "suffix": "dwi",
+      "criteria": {
+      	"ProtocolName": {"any" : ["*dti_1.5mmiso_A>P*", "*dti_1.5mmiso_AP*", "*dti_1.5mmiso_A_P*"]}
+      }
+    },
+    {
+      "id": "id_task-rest",
+      "datatype": "func",
+      "suffix": "bold",
+      "custom_entities": "task-rest",
+      "criteria": {
+        "ProtocolName": {"any" : ["*rest_ep2d*"]},
+        "SeriesDescription": {"any" : ["*rest_ep2d*"]}
+      },
+      "sidecar_changes": {
+        "TaskName": "rest",
+        "SMS": "MB8"
+      }
+    },
+    {
+      "datatype": "fmap",
+      "suffix": "dwi",
+      "custom_entities": "dir-PA",
+      "criteria": {
+      	"ProtocolName": {"any" : ["*dti_1.5mmiso_P>A*", "*dti_1.5mmiso_PA*", "*dti_1.5mmiso_P_A*"]}
+      },
+       "sidecar_changes": {
+        "intendedFor": ["id_dwi"]
+      }
+    },
+    {
+      "datatype": "fmap",
+      "suffix": "epi",
+      "custom_entities": "dir-PA",
+      "criteria": {
+        "ProtocolName": {"any" : ["*ep2d_bold_2mm_PA"]},
+        "SeriesDescription": {"any" : ["*ep2d_bold_2mm_PA"]}
+      },
+       "sidecar_changes": {
+        "intendedFor": ["id_task_rest"]
+      }
+    },
+    {
+      "datatype": "fmap",
+      "suffix": "epi",
+      "custom_entities": "dir-AP",
+      "criteria": {
+        "ProtocolName": {"any" : ["*ep2d_bold_2mm_AP"]},
+        "SeriesDescription": {"any" : ["*ep2d_bold_2mm_AP"]}
+      },
+       "sidecar_changes": {
+        "intendedFor": ["id_task_rest"]
+      }
+    }
+  ],
+  "post_op": [
+  {
+    "cmd": "pydeface --outfile dst_file src_file",
+    "datatype": "anat",
+    "suffix": [
+      "any"
+    ]
+  }]
+}
