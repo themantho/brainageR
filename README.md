@@ -206,7 +206,7 @@ The script requests the following resources to calculate brain age in approximat
 
 If jobs are exceeding the time limit (you can check for jobs cancelled due to time limit exceeded in the log folder), increase --time (format min:sec) appropriately.
 
-IMPORTANT: The "subjects" file input intentionally omits the ".txt" extension because the subject ID file is created without an explicit file type. This defaults to a text file, but you do not need to specify ".txt" when submitting the sbatch command. In other words, "subjects" and "subjects.txt" are not equivalent file names. If you encounter an error where the subject ID file cannot be located, this may be the source of the error, so be careful when naming files and specifying inputs.
+**Important**: The "subjects" file input intentionally omits the ".txt" extension because the subject ID file is created without an explicit file type. This defaults to a text file, but you do not need to specify ".txt" when submitting the sbatch command. In other words, "subjects" and "subjects.txt" are not equivalent file names. If you encounter an error where the subject ID file cannot be located, this may be the source of the error, so be careful when naming files and specifying inputs.
 
 ## Step 5. Collate subject files into a single csv
 
