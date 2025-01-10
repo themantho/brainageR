@@ -173,7 +173,7 @@ The subject ID file will be stored in brainageR/software/subjectIDs.
 
 ## Step 5. Running the brainageR scripts
 
-Before running the `slurm_submit_brainageR.sh` batch script, add the raw T1w nifti (.nii) images to the brainageR_t1 subdirectory. You can either copy the images directly to /brainageR_t1 or create symbolic links in the directory using `create_symlinks.sh`. The brainageR_t1 directory should look something like this, where sub-001...sub-003 are example subject IDs and ses-01 refers to the baseline scan (i.e., session 1):
+Before running the `slurm_submit_brainageR.sh` batch script, add the raw T1w nifti (.nii) images to the brainageR_t1 subdirectory. You can either copy the images directly to /brainageR_t1 or create symbolic links in the directory using `create_symlinks.sh`. The brainageR_t1 directory should look something like below. In this example, sub-001...sub-003 are example subject IDs and ses-01 refers to the baseline scan:
 
 ```
 brainageR/
