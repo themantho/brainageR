@@ -33,7 +33,7 @@ Individual subject brain age and aggregate brain age files will be here after ru
 
 `/brainageR_T1`
 
-Copy the raw (unprocessed) T1w nifti files or create symbolic links (make sure Tw1 images are unzipped), with a separate folder for each subject (e.g., /brainageR_T1/sub-ID/sub-ID_ses-01_T1w.nii).
+Copy the raw (unprocessed) T1w nifti files or create symbolic links, with a separate folder for each subject (e.g., /brainageR_T1/sub-ID/sub-ID_ses-01_T1w.nii).
 
 **Important**: The files should be .nii (unzipped nifti), not .nii.gz or another zip flavor. Intermediate files will also be stored here.
 
