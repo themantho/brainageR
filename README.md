@@ -185,9 +185,7 @@ brainageR/
     ...
 ```
 
-**Important**: The T1w images must be unzipped. If the T1w images are .nii.gz, the brainageR script will not be able to locate the files.
-
-Change the username in `slurm_submit_brainageR.sh`.
+Don't forget to change the username in `slurm_submit_brainageR.sh`.
 
 ```bash
 # Set up environment and change the username to your own
