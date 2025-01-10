@@ -37,21 +37,21 @@ Copy the raw (unprocessed) T1w nifti files or create symbolic links (make sure T
 
 **Important**: The files should be .nii (unzipped nifti), not .nii.gz or another zip flavor. Intermediate files will also be stored here.
 
-/logs
+`/logs`
 
 When things go wrong, look here for log and error files. If this folder does not exist initially, it will be created when you run the script.
 
-/scripts_templates
+`/scripts_templates`
 
 Copies of the scripts referenced in the original README.md are here, as a backup.
 
-/subjectIDs
+`/subjectIDs`
 
 Store subject ID files here. The subject ID file should be a text file with one ID per line and no extra whitespace before/after each ID. An example file is provided in this folder.
 
 When using a single subject ID file, make sure to overwrite it, rather than append new IDs to the existing list. Verify no whitespace or extra lines exist after the last ID so that slurm does not submit a job for an "empty ID". When working with multiple subject ID files (e.g., multi-site data, testing a subject), it is recommended that you add a suffix to the 'subjects' file name (e.g., subjects_test, subjects_sitename), so that you can switch between different ID files when needed instead of repeatedly generating different ID files.
 
-/templates
+`/templates`
 
 Templates used to calculate brain age. These are not script templates. DO NOT TOUCH. DO NOT CHANGE.
 
@@ -59,11 +59,11 @@ Templates used to calculate brain age. These are not script templates. DO NOT TO
 
 Example scripts for converting DICOMs to BIDS using the dcm2bids package are located in the dcm2bids folder. Note: These scripts were originally written for
 
-/bids_config
+`/bids_config`
 
 Contains the BIDS configuration file. The config file should be created based on your MRI acquisition protocol parameters. By default it will deface the T1w image using pydeface. Note that this config is designed for dcm2bids >=3.0.0. dcm2bids>=3.0.0 is not compatible with config files made for v2.1.9 and below.
 
-/logs
+`/logs`
 
 Log and error files for dcm2bids and pydeface will be stored here. dcm2bids and pydeface log subdirectories will be created by 'submit_dcm2bids.sh'.
 
@@ -73,19 +73,19 @@ Log and error files for dcm2bids and pydeface will be stored here. dcm2bids and 
 
 The brainageR package uses a combination of scripts to perform the following steps:
 
-1. **Activate environment**: The `bashrc` file loads the HPC modules and software paths and activates the conda envrionment. The 'config' file includes user-defined paths and variables. The project paths will auto-populate with the user-defined variables.
+1. **Activate environment**: The bashrc file loads the HPC modules and software paths and activates the conda envrionment. The config file includes user-defined paths and variables. The project paths will auto-populate with the user-defined variables.
 
 2. **DICOM-BIDS conversion**: The `submit_dcm2bids.sh` script iterates over an array of subject IDs and submits 'run_dcm2bids.sh' for each subject to convert the raw T1 images to BIDS. If your data is already in BIDS format, you can skip this step.
 
-3. **Brain age calculation**: The `slurm_submit_brainageR.sh` script iterates over an array of subject IDs and submits run_brainageR.sh for each subject, allowing multiple subjects to run in parallel.
+3. **Brain age calculation**: The `slurm_submit_brainageR.sh` script iterates over an array of subject IDs and submits `run_brainageR.sh` for each subject, allowing multiple subjects to run in parallel.
 
-4. **Collate brain age calculations**: The `collate_brain_ages.sh` script collates the individual brain age calculations into a single csv file. The output csv and individual subject brain age csv files are stored in brainageR/software/brainageR_output/<study_name>.
+4. **Collate brain age calculations**: `collate_brain_ages.sh` collates the individual brain age calculations into a single csv file. The output csv and individual subject brain age csv files are stored in brainageR/software/brainageR_output/<study_name>.
 
 ### dcm2bids folder
 
 1. **Activate environment**: `submit_dcm2bids.sh` calls the bashrc and config files in the software directory. Follow Step 2 to update the config file.
 
-2. **DICOM-BIDS conversion**: The `submit_dcm2bids.sh` script submits a job array by calling `run_dcm2bids.sh` to convert the raw T1 images to BIDS for each subject. `run_dcm2bids.sh` uses the BIDS config file in the bids_config subdirectory to organize the DICOM files.
+2. **DICOM-BIDS conversion**: `submit_dcm2bids.sh` submits a job array by calling `run_dcm2bids.sh` to convert the raw T1 images to BIDS for each subject. `run_dcm2bids.sh` uses the BIDS config file in /dcm2bids/bids_config to organize the DICOM files.
 
 ## Step 1: Setup environment
 
