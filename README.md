@@ -65,7 +65,7 @@ Contains the BIDS configuration file. The config file should be created based on
 
 `/logs`
 
-Log and error files for dcm2bids and pydeface will be stored here. dcm2bids and pydeface log subdirectories will be created by 'submit_dcm2bids.sh'.
+Log and error files for dcm2bids and pydeface will be stored here. dcm2bids and pydeface log subdirectories will be created by `submit_dcm2bids.sh`.
 
 ## Script overview
 
