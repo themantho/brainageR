@@ -228,6 +228,6 @@ filename="$study"_ses-"$ses"_brain_age.csv
 source $SCRIPTS_DIR/collate_brain_ages.sh $OUT_DIR $OUT_DIR/$filename
 ```
 
-The output file will include subject ID, brain age, and lower/upper confidence intervals. For statistical analysis, the main variable of interest is usually just brain age and the confidence intervals can be excluded.
+The output file will include subject ID, brain age, and lower/upper confidence intervals. For statistical analysis, the main variable of interest is usually just brain age and the confidence intervals do not need to be included in the model.
 
 If you cannot find the summary csv file, verify your OUT_DIR path!
