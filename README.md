@@ -86,12 +86,9 @@ The brainageR package uses a combination of scripts to perform the following ste
 
 ### dcm2bids folder
 
-1. **Activate environment**: 'submit_dcm2bids.sh' calls the bashrc and config files in the software directory.
-2. loads the HPC modules and software paths and activates the conda envrionment. The 'config' file includes user-defined paths and variables. The project paths will auto-populate with the user-defined variables.
+1. **Activate environment**: 'submit_dcm2bids.sh' calls the bashrc and config files in the software directory. Follow Step 2 to update the config file.
 
-3. **DICOM-BIDS conversion**: The `submit_dcm2bids.sh` script submits a job array by calling 'run_dcm2bids.sh' to convert the raw T1 images to BIDS for each subject. You can skip this step, if your data is already in BIDS format.
-
-4. **Brain age calculation**: The 'slurm_submit_brainageR.sh' script submits a job array by calling 'run_brainageR.sh' to calculate brain age for each subject.
+2. **DICOM-BIDS conversion**: The `submit_dcm2bids.sh` script submits a job array by calling 'run_dcm2bids.sh' to convert the raw T1 images to BIDS for each subject. 'run_dcm2bids.sh' uses the BIDS config file in the bids_config subdirectory to organize the DICOM files.
 
 ## Step 1: Setup environment
 
@@ -141,7 +138,7 @@ Several scripts are included in the dcm2bids directory to help you convert to BI
 
 1. Configure the BIDS config file based on the MRI acquisition protocol for your dataset. At a minimum, the config figure should convert the anat T1w image to BIDS.
 2. Specify your username in 'submit_dcm2bids.sh'.
-3. Follow Step 4 for creating a subject ID file, but create the file based on the IDs in your DICOM directory instead of the BIDS directory
+3. Create the subject ID file for BIDS conversion.
 
 ### Create a subject ID file for BIDS conversion
 
@@ -177,9 +174,31 @@ $(echo ls $BIDS_DIR) > $SCRIPTS_DIR/subjectIDs/subjects
 
 The subject ID file will be stored in brainageR/software/subjectIDs.
 
-## Step 4. Running the brainageR scripts
+## Step 5. Running the brainageR scripts
 
-The main batch script is "slurm_submit_brainageR.sh" and takes the subjects ID file as its input, with the following command in terminal:
+Before running the 'slurm_submit_brainageR.sh' batch script, add the raw T1w nifti (.nii) images to the brainageR_t1 subdirectory. You can either copy the images directly to /brainageR_t1 or create symbolic links in the directory using 'create_symlinks.sh'. The brainageR_t1 directory should look something like this, where sub-001...sub-003 are example subject IDs and ses-01 refers to the baseline scan (i.e., session 1):
+
+```
+brainageR/
+└── software/
+    └── brainageR_t1/
+        ├── sub-001_ses-01_T1w.nii
+        ├── sub-002_ses-01_T1w.nii
+        └── sub-003_ses-01_T1w.nii
+    ...
+```
+
+**Important**: The T1w images must be unzipped. If the T1w images are .nii.gz, the brainageR script will not be able to locate the files.
+
+Change the username in slurm_submit_brainageR.sh.
+
+```bash
+# Set up environment and change the username to your own
+SOURCE_FILE=/scratch/USERNAME/brainageR/software/bashrc
+CONFIG_FILE=/scratch/USERNAME/brainageR/software/config
+```
+
+Run 'slurm_submit_brainageR.sh' with the following command in terminal, where 'subjects' is the input subject ID file:
 
 ```bash
 sbatch slurm_submit_brainageR.sh subjects
@@ -190,32 +209,24 @@ The script requests the following resources to calculate brain age in approximat
 --mem=24g
 --cpus-per-task=4
 
-If jobs are exceeding the time limit (you can check for jobs cancelled due to time limit exceeded in the log folder), increase --time (format hr:min:sec) appropriately.
+If jobs are exceeding the time limit (you can check for jobs cancelled due to time limit exceeded in the log folder), increase --time (format min:sec) appropriately.
 
-IMPORTANT: The "subjects" input intentionally omits the ".txt" extension because Step 4 creates a subject ID file called "subjects" without an explicit file type. This defaults to a text file, but you do not need to specify ".txt" in the sbatch input. In other words, "subjects" and "subjects.txt" are not equivalent file names. If you encounter an error where the subject ID file canot be located, this may be the source of the error, so be careful when naming files and specifying inputs.
-
-Change the username in slurm_submit_brainageR.sh.
-
-```bash
-# Set up environment and change the username to your own
-SOURCE_FILE=/scratch/USERNAME/brainageR/software/bashrc
-CONFIG_FILE=/scratch/USERNAME/brainageR/software/config
-```
+IMPORTANT: The "subjects" file input intentionally omits the ".txt" extension because the subject ID file is created without an explicit file type. This defaults to a text file, but you do not need to specify ".txt" when submitting the sbatch command. In other words, "subjects" and "subjects.txt" are not equivalent file names. If you encounter an error where the subject ID file cannot be located, this may be the source of the error, so be careful when naming files and specifying inputs.
 
 ## Step 5. Collate subject files into a single csv
 
-brainageR generates a .csv file for each subject. After the batch job has completed, you can collate all subject brain ages into a single .csv.
+brainageR generates a .csv file for each subject, which will be saved in /software/brainageR_output. After the batch job has completed, you can collate the individual csv files into a single summary .csv.
 
-The batch script can perform this step after looping over all subjects. You can also comment out that line (current set up), process all subjects, then run the below command separately in terminal. This does not require activating the conda env or submitting a job to slurm, as the computational resources are minimal.
+The batch script can perform this step after iterating over all subjects. You can also comment out that line (current set up), process all subjects, then run the below command separately in terminal. This does not require submitting a job to slurm, as the computational resources are minimal.
 
-```
+```bash
 # Change current directory to the scripts folder, replacing 'username' with your own username.
 cd /scratch/username/brainageR/software
 
 # Load the config file
 source ./config
 
-# Either define the filename based on info in the config file or specify a filename
+# Define a file name or use info from the config file (as done here):
 filename="$study"_ses-"$ses"_brain_age.csv
 
 # Collate brain age into a csv file
@@ -224,8 +235,4 @@ source $SCRIPTS_DIR/collate_brain_ages.sh $OUT_DIR $OUT_DIR/$filename
 
 The output file will include subject ID, brain age, and lower/upper confidence intervals. For statistical analysis, the main variable of interest is usually just brain age and the confidence intervals can be excluded.
 
-## Step 6. Troubleshooting
-
-If the log file displays the error msg badStr = 'param(6)\*scal;', this means there was an error with running SPM and preprocessing failed.
-
-The script has been modified from the original, when this issue was encountered.
+If you cannot find the summary csv file, verify your OUT_DIR path!
