@@ -27,16 +27,15 @@ There are two subdirectories: software and dcm2bids.
 
 All brainageR scripts and model data are stored in the software directory:
 
-/brainageR_output
+`/brainageR_output`
 
 Individual subject brain age and aggregate brain age files will be here after running the calculation.
 
-/brainageR_T1
+`/brainageR_T1`
 
-Create symbolic links to subjects' raw (unprocessed) T1.nii (make sure they are unzipped) or copy the files here, with a separate folder for each subject (e.g., /brainageR_T1/sub-ID/sub-ID_ses-01_T1w.nii).
+Copy the raw (unprocessed) T1w nifti files or create symbolic links (make sure Tw1 images are unzipped), with a separate folder for each subject (e.g., /brainageR_T1/sub-ID/sub-ID_ses-01_T1w.nii).
 
-Important:
-The files should be .nii (unzipped nifti), not .nii.gz or another zip flavor. Intermediate files will also be stored here.
+**Important**: The files should be .nii (unzipped nifti), not .nii.gz or another zip flavor. Intermediate files will also be stored here.
 
 /logs
 
@@ -71,8 +70,6 @@ Log and error files for dcm2bids and pydeface will be stored here. dcm2bids and 
 ## Script overview
 
 ### Software folder
-
-'slurm_submit_brainageR.sh'
 
 The brainageR package uses a combination of scripts to perform the following steps:
 
