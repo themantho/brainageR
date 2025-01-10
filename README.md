@@ -80,15 +80,15 @@ The brainageR package uses a combination of scripts to perform the following ste
 
 2. **DICOM-BIDS conversion**: The `submit_dcm2bids.sh` script iterates over an array of subject IDs and submits 'run_dcm2bids.sh' for each subject to convert the raw T1 images to BIDS. If your data is already in BIDS format, you can skip this step.
 
-3. **Brain age calculation**: The 'slurm_submit_brainageR.sh' script iterates over an array of subject IDs and submits run_brainageR.sh for each subject, allowing multiple subjects to run in parallel.
+3. **Brain age calculation**: The `slurm_submit_brainageR.sh` script iterates over an array of subject IDs and submits run_brainageR.sh for each subject, allowing multiple subjects to run in parallel.
 
-4. **Collate brain age calculations**: The 'collate_brain_ages.sh' script collates the individual brain age calculations into a single csv file. The output csv and individual subject brain age csv files are stored in brainageR/software/brainageR_output/<study_name>.
+4. **Collate brain age calculations**: The `collate_brain_ages.sh` script collates the individual brain age calculations into a single csv file. The output csv and individual subject brain age csv files are stored in brainageR/software/brainageR_output/<study_name>.
 
 ### dcm2bids folder
 
-1. **Activate environment**: 'submit_dcm2bids.sh' calls the bashrc and config files in the software directory. Follow Step 2 to update the config file.
+1. **Activate environment**: `submit_dcm2bids.sh` calls the bashrc and config files in the software directory. Follow Step 2 to update the config file.
 
-2. **DICOM-BIDS conversion**: The `submit_dcm2bids.sh` script submits a job array by calling 'run_dcm2bids.sh' to convert the raw T1 images to BIDS for each subject. 'run_dcm2bids.sh' uses the BIDS config file in the bids_config subdirectory to organize the DICOM files.
+2. **DICOM-BIDS conversion**: The `submit_dcm2bids.sh` script submits a job array by calling `run_dcm2bids.sh` to convert the raw T1 images to BIDS for each subject. `run_dcm2bids.sh` uses the BIDS config file in the bids_config subdirectory to organize the DICOM files.
 
 ## Step 1: Setup environment
 
@@ -137,7 +137,7 @@ The batch scripts in this repo expect BIDS format. For dcm2bids usage, see https
 Several scripts are included in the dcm2bids directory to help you convert to BIDS. These files should NOT be used as-is and will require some editing based on your dataset:
 
 1. Configure the BIDS config file based on the MRI acquisition protocol for your dataset. At a minimum, the config figure should convert the anat T1w image to BIDS.
-2. Specify your username in 'submit_dcm2bids.sh'.
+2. Specify your username in `submit_dcm2bids.sh`.
 3. Create the subject ID file for BIDS conversion.
 
 ### Create a subject ID file for BIDS conversion
@@ -155,11 +155,11 @@ source ./config
 $(echo ls $DICOM_DIR) > $DCM_BIDS_DIR/subjects_dcm2bids
 ```
 
-The subject ID file will be stored in brainageR/dcm2bids.
+The subject ID file will be stored in /brainageR/dcm2bids.
 
 ## Step 4. Create a subject ID file for brainageR
 
-Now we need to create a subject ID file for the brain age calculation. There is an example file in 'software/subjectsIDs' called 'subjects'. Either rename this file or delete it before creating your own subject ID file.
+Now we need to create a subject ID file for the brain age calculation. There is an example file in /software/subjectsIDs called 'subjects'. Either rename this file or delete it before creating your own subject ID file.
 
 Open a terminal window and change the current directory to the scripts folder, then load the config file and create a subject ID file with the following commands:
 
@@ -176,7 +176,7 @@ The subject ID file will be stored in brainageR/software/subjectIDs.
 
 ## Step 5. Running the brainageR scripts
 
-Before running the 'slurm_submit_brainageR.sh' batch script, add the raw T1w nifti (.nii) images to the brainageR_t1 subdirectory. You can either copy the images directly to /brainageR_t1 or create symbolic links in the directory using 'create_symlinks.sh'. The brainageR_t1 directory should look something like this, where sub-001...sub-003 are example subject IDs and ses-01 refers to the baseline scan (i.e., session 1):
+Before running the `slurm_submit_brainageR.sh` batch script, add the raw T1w nifti (.nii) images to the brainageR_t1 subdirectory. You can either copy the images directly to /brainageR_t1 or create symbolic links in the directory using `create_symlinks.sh`. The brainageR_t1 directory should look something like this, where sub-001...sub-003 are example subject IDs and ses-01 refers to the baseline scan (i.e., session 1):
 
 ```
 brainageR/
@@ -190,7 +190,7 @@ brainageR/
 
 **Important**: The T1w images must be unzipped. If the T1w images are .nii.gz, the brainageR script will not be able to locate the files.
 
-Change the username in slurm_submit_brainageR.sh.
+Change the username in `slurm_submit_brainageR.sh`.
 
 ```bash
 # Set up environment and change the username to your own
@@ -198,7 +198,7 @@ SOURCE_FILE=/scratch/USERNAME/brainageR/software/bashrc
 CONFIG_FILE=/scratch/USERNAME/brainageR/software/config
 ```
 
-Run 'slurm_submit_brainageR.sh' with the following command in terminal, where 'subjects' is the input subject ID file:
+Run `slurm_submit_brainageR.sh` with the following command in terminal, where 'subjects' is the input subject ID file:
 
 ```bash
 sbatch slurm_submit_brainageR.sh subjects
@@ -215,9 +215,9 @@ IMPORTANT: The "subjects" file input intentionally omits the ".txt" extension be
 
 ## Step 5. Collate subject files into a single csv
 
-brainageR generates a .csv file for each subject, which will be saved in /software/brainageR_output. After the batch job has completed, you can collate the individual csv files into a single summary .csv.
+brainageR generates a .csv file for each subject, which will be saved in /software/brainageR_output. After the batch job has completed, you can collate the individual csv files into a single summary .csv with `collate_brain_ages.sh`.
 
-The batch script can perform this step after iterating over all subjects. You can also comment out that line (current set up), process all subjects, then run the below command separately in terminal. This does not require submitting a job to slurm, as the computational resources are minimal.
+The batch script can perform this step after iterating over all subjects. You can also comment out the line (current set up), calculate the brain age for all subjects, then run the below commands in terminal. This does not require submitting a job to slurm, as the computational resources are minimal.
 
 ```bash
 # Change current directory to the scripts folder, replacing 'username' with your own username.
